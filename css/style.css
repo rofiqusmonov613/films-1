@@ -18,7 +18,7 @@ body{
     display: flex;
     flex-direction: column;
     font-family: "Asap", sans-serif;
-    background: linear-gradient(to right,orange,gold);
+    background: linear-gradient(to right,#FCFFA6,#C1FFD7,#B5DEFF,#CAB8FF);
     min-height: 100vh;
 }
 .container{

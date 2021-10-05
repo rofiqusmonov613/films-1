@@ -1,44 +1,59 @@
 const elList = document.querySelector('.films__card-wrapper');
+const elCheck = document.querySelector('.button');
 const elForm = document.querySelector('.form');
 const elInputSearch = selectElem('.films__input-serach', elForm);
 const elSelect = selectElem('.films__select', elForm);
+const elDiv = document.querySelector('.modal')
+const elBtn = document.querySelector('.btn')
 const elFilter = selectElem('.films__filter', elForm);
-const elTemplate = document.querySelector('#template').content
+const elTemplate = document.querySelector('#template').content;
+const elDivWrapper = document.querySelector('.modal-wrapper');
+const elDivWrapperInner = document.querySelector('.modal-wrapper-inner');
+const elIcon = document.querySelector('.btn-icon');
+const elFa = document.querySelector('.fa-regular');
+const elSolid = document.querySelector('.fa-solid')
+
+let modalArray = []
+
 
 function renderMovies(filmsArr, element){
     element.innerHTML = null;
     
-    filmsArr.forEach((film) =>{
+    filmsArr.forEach((films) =>{
         const cloneTemplate = elTemplate.cloneNode(true);
         
-        selectElem('.films__img', cloneTemplate).src = film.poster
-        selectElem('.films__card-title', cloneTemplate).textContent = film.title
-        selectElem('.films__card-genre', cloneTemplate).textContent = film.genres
-        selectElem('.films__release-date', cloneTemplate).textContent = normalizeDate(film.release_date)
-        selectElem('.films__release-date', cloneTemplate).datetime = normalizeDate(film.release_date)
-        
+        selectElem('.films__img', cloneTemplate).src = films.poster
+        selectElem('.films__card-title', cloneTemplate).textContent = films.title
+        selectElem('.films__card-genre', cloneTemplate).textContent = films.genres
+        selectElem('.films__release-date', cloneTemplate).release_date = films.release_date;
+
+        cloneTemplate.querySelector('.btn-icon').dataset.itemId = films.id
+        cloneTemplate.querySelector('.fa-regular').dataset.itemId = films.id
+        cloneTemplate.querySelector('.delete_btn').dataset.deleteId = films.id
+        cloneTemplate.querySelector('.fa-solid').dataset.deleteId = films.id
+
         element.appendChild(cloneTemplate);
     })
 }
 
 renderMovies(films, elList);
 
-function renderGenres(filmArr, element){
+function renderGenres(filmsArr, element){
     
     let result = [];
     
-    filmArr.forEach((film) => {
-        film.genres.forEach(genre =>{
-            if(!result.includes(genre)){
-                result.push(genre)
+    filmsArr.forEach((films) => {
+        films.genres.forEach(genres =>{
+            if(!result.includes(genres)){
+                result.push(genres)
             }
         })
     })
     
-    result.forEach(genre =>{
+    result.forEach(genres =>{
         let newOption = createDOM('option');
-        newOption.textContent = genre;
-        newOption.value = genre;
+        newOption.textContent = genres;
+        newOption.value = genres;
         
         element.appendChild(newOption)
     })
@@ -55,14 +70,14 @@ elForm.addEventListener('submit', (e) =>{
     
     const regex = new RegExp(inputValue, 'gi');
     
-    const filteredFilms = films.filter((film) => film.title.match(regex));
+    const filteredFilms = films.filter((films) => films.title.match(regex));
     
     let foundFilms = [];
     
     if(selectValue === 'All'){
         foundFilms = filteredFilms
     }else{
-        foundFilms = filteredFilms.filter(film => film.genres.includes(selectValue))
+        foundFilms = filteredFilms.filter(films => films.genres.includes(selectValue))
     }
     
     if(filterValue === 'a_z'){
@@ -111,3 +126,74 @@ elForm.addEventListener('submit', (e) =>{
 
     renderMovies(foundFilms, elList);
 });
+elCheck.addEventListener('click', function() {
+
+    if(elCheck) {
+        elDiv.style.display = 'flex';
+        elDivWrapper.style.display = 'block';
+        
+    }
+})
+elBtn.addEventListener('click', function() {
+
+    if(elBtn) {
+        elDiv.style.display = 'none';
+        elDivWrapper.style.display = 'none';
+    }
+})
+// elVedro.addEventListener('click', function() {
+//       elLi.style.display = 'none';
+// })
+
+function setModal(){
+
+    elDivWrapperInner.innerHTML = "";
+    modalArray.forEach((item) => {
+        const cloneTemplate = elTemplate.cloneNode(true);
+        
+        selectElem('.films__img', cloneTemplate).src = item.poster
+        selectElem('.films__card-title', cloneTemplate).textContent = item.title
+        selectElem('.films__card-genre', cloneTemplate).textContent = item.genres
+        selectElem('.films__release-date', cloneTemplate).release_date = item.release_date;
+
+        cloneTemplate.querySelector('.btn-icon').dataset.itemId = item.id
+        cloneTemplate.querySelector('.fa-regular').dataset.itemId = item.id
+        cloneTemplate.querySelector('.delete_btn').dataset.itemId = item.id
+        cloneTemplate.querySelector('.fa-solid').dataset.itemId = item.id
+        
+        
+        elDivWrapperInner.appendChild(cloneTemplate);
+    })
+}
+
+
+elList.addEventListener('click', function(event) {
+    films.forEach((item) => {
+        if(event.target.dataset.itemId == item.id){
+            modalArray.push(item)
+           
+        }
+    })
+    
+    console.log(modalArray)
+    setModal()
+    
+});
+
+function deletefilms(index){
+    modalArray.splice(index,1)
+}
+
+
+elDivWrapperInner.addEventListener('click', function(event) {
+  if(event.target.matches('.delete_btn')){
+    deletefilms(Number(event.target.dataset.deleteId))
+    setModal()
+  }
+})
+elDivWrapperInner.addEventListener('click', function(event) {
+    if(event.target.matches('.fa-solid')){
+      deletefilms(Number(event.target.dataset.deleteId))
+      setModal()
+    }
+  })
